@@ -12,6 +12,7 @@ type Comment {
 type Mutation {
   createUser(email: String!, firstName: String!, lastName: String!, password: String!): User!
   deleteUser(id: String!): Boolean!
+  logUser(email: String!, password: String!): String!
 }
 
 type Post {

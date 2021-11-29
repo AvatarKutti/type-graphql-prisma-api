@@ -23,6 +23,7 @@ const main = async () => {
 
   const server = new ApolloServer({
     schema,
+    context: ({ req }: any) => ({ req }),
   });
 
   // Starting the server before applying the app as middleware and listening on port 8080

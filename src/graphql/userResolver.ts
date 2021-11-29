@@ -2,23 +2,31 @@ import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
 import * as bcrypt from "bcryptjs";
 import { getMongoManager, getMongoRepository } from "typeorm";
-
-// import { Post } from "../entities/Post"
+const ObjectId = require("mongodb").ObjectID;
+import * as jwt from "jsonwebtoken";
+// import { Post } from "../entities/Post";
 
 @Resolver()
 export class UserResolver {
   @Query(() => [User])
   async users(): Promise<User[]> {
-    console.log("query started");
+    // Got an error "TypeError: Cannot read property 'prototype' of undefined"
+    // Fixed it by downgrading to mongodb version 3.7.1
 
     const userRepo = getMongoRepository(User);
 
+    // Gets the user collection and finds all the users in that collection
+
     const users = await userRepo.find({});
 
-    console.log("query ending");
+    //Returns the users found in that query
+
     return users;
   }
 
+  // Mutations
+
+  //This mutation creates the user by getting the data in the form of arguments(@Arg)
   @Mutation(() => User)
   async createUser(
     @Arg("firstName") firstName: string,
@@ -33,21 +41,63 @@ export class UserResolver {
       lastName,
       email,
       password: hashedPassword,
+      posts: [],
     }).save();
 
     return user;
   }
 
+  // This mutation deletes a user by using their id
+
   @Mutation(() => Boolean)
   async deleteUser(@Arg("id") id: string) {
     const manager = getMongoManager();
-    const user = await manager.findOneAndDelete(User, {
-      where: {
-        _id: id,
-      },
-    });
-    console.log(user);
+    try {
+      const user = await manager.findOneAndDelete(User, { _id: ObjectId(id) });
+      console.log(user);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
-    return true;
+  // This mutation log In's a user by getting their email and password , Also this mutation sends back a token
+
+  @Mutation(() => String)
+  async logUser(
+    @Arg("email") email: string,
+    @Arg("password") password: string
+  ) {
+    const userRepo = getMongoRepository(User);
+
+    // Finds the user with the email given
+    const user = await userRepo.findOne({ email });
+
+    // Checks if user exists for the given email
+
+    if (!user) {
+      throw new Error("User not found! Please check your email");
+    }
+
+    // If user exists it checks whether the password is right
+
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    // Checks whether the passowrd is correct if not throws an error
+
+    if (!comparePassword) {
+      throw new Error("User not found! Please check your password");
+    }
+
+    // If given information is right signs a json web token and sends it back
+
+    const token = jwt.sign(
+      { userId: user.id },
+      "jsiffsfagfmabgjwgahuaghaughaugauywgaehjgege"
+    );
+
+    // Returns the token
+
+    return token;
   }
 }
