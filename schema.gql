@@ -6,13 +6,15 @@
 type Comment {
   author: String!
   content: String!
-  id: ID!
 }
 
 type Mutation {
+  createPost(body: String!, title: String!, userId: String!): Post!
   createUser(email: String!, firstName: String!, lastName: String!, password: String!): User!
+  deletePost(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   logUser(email: String!, password: String!): String!
+  postComment(author: String!, content: String!, postId: String!): Boolean!
 }
 
 type Post {
@@ -23,6 +25,7 @@ type Post {
 }
 
 type Query {
+  posts: [Post!]!
   users: [User!]!
 }
 
@@ -31,5 +34,5 @@ type User {
   firstName: String!
   id: ID!
   lastName: String!
-  posts: [Post!]!
+  posts: [ID!]!
 }

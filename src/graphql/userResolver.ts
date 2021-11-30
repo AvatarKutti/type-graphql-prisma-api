@@ -1,13 +1,15 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { User } from "../entities/User";
 import * as bcrypt from "bcryptjs";
 import { getMongoManager, getMongoRepository } from "typeorm";
 const ObjectId = require("mongodb").ObjectID;
 import * as jwt from "jsonwebtoken";
+import { AuthMiddleware } from "./middlewares/authMiddleware";
 
 @Resolver()
 export class UserResolver {
   @Query(() => [User])
+  @UseMiddleware(AuthMiddleware)
   async users(): Promise<User[]> {
     // Got an error "TypeError: Cannot read property 'prototype' of undefined"
     // Fixed it by downgrading to mongodb version 3.7.1
@@ -27,6 +29,7 @@ export class UserResolver {
 
   //This mutation creates the user by getting the data in the form of arguments(@Arg)
   @Mutation(() => User)
+  @UseMiddleware(AuthMiddleware)
   async createUser(
     @Arg("firstName") firstName: string,
     @Arg("lastName") lastName: string,
@@ -51,6 +54,7 @@ export class UserResolver {
   // This mutation deletes a user by using their id
 
   @Mutation(() => Boolean)
+  @UseMiddleware(AuthMiddleware)
   async deleteUser(@Arg("id") id: string) {
     const manager = getMongoManager();
     try {
@@ -65,6 +69,7 @@ export class UserResolver {
   // This mutation log In's a user by getting their email and password , Also this mutation sends back a token
 
   @Mutation(() => String)
+  @UseMiddleware(AuthMiddleware)
   async logUser(
     @Arg("email") email: string,
     @Arg("password") password: string

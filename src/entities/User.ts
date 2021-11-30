@@ -1,6 +1,5 @@
 import { Entity, ObjectID, ObjectIdColumn, Column, BaseEntity } from "typeorm";
 import { ObjectType, Field, ID } from "type-graphql";
-import { Post } from "./Post";
 
 @ObjectType()
 @Entity()
@@ -24,7 +23,7 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Field(() => [Post])
+  @Field(() => [ID])
   @Column()
-  posts: Post[];
+  posts: string[];
 }

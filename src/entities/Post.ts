@@ -24,10 +24,6 @@ export class Post extends BaseEntity {
 @ObjectType()
 @Entity()
 class Comment {
-  @Field(() => ID)
-  @ObjectIdColumn()
-  id: ObjectID;
-
   @Field()
   @Column()
   author: string;

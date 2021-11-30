@@ -5,6 +5,9 @@ import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { UserResolver } from "./graphql/userResolver";
 import { PostResolver } from "./graphql/postResolver";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const main = async () => {
   // Connecting to mongodb
@@ -15,6 +18,8 @@ const main = async () => {
 
   const app = Express();
 
+  // const req = Express.request;
+
   // Creating & Adding the schema to apollo-server
 
   const schema = await buildSchema({
@@ -24,7 +29,7 @@ const main = async () => {
 
   const server = new ApolloServer({
     schema,
-    context: ({ req }: any) => ({ req }),
+    context: ({ req }) => ({ req }),
   });
 
   // Starting the server before applying the app as middleware and listening on port 8080
