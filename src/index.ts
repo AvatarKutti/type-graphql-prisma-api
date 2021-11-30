@@ -4,6 +4,7 @@ import * as Express from "express";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { UserResolver } from "./graphql/userResolver";
+import { PostResolver } from "./graphql/postResolver";
 
 const main = async () => {
   // Connecting to mongodb
@@ -17,7 +18,7 @@ const main = async () => {
   // Creating & Adding the schema to apollo-server
 
   const schema = await buildSchema({
-    resolvers: [UserResolver],
+    resolvers: [UserResolver, PostResolver],
     emitSchemaFile: true,
   });
 

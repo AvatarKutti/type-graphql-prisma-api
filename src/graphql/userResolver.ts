@@ -4,7 +4,6 @@ import * as bcrypt from "bcryptjs";
 import { getMongoManager, getMongoRepository } from "typeorm";
 const ObjectId = require("mongodb").ObjectID;
 import * as jwt from "jsonwebtoken";
-// import { Post } from "../entities/Post";
 
 @Resolver()
 export class UserResolver {
@@ -34,8 +33,10 @@ export class UserResolver {
     @Arg("email") email: string,
     @Arg("password") password: string
   ): Promise<User> {
+    //Hashes the password
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Creates the user and reutrns the user
     const user = await User.create({
       firstName,
       lastName,
